@@ -1,5 +1,9 @@
 # 【树莓派Pico】16位100MHz并口高速输入数据|读取并口数据|PIO|DMA
 
+![pic](https://github.com/mxyxbb/parallel-in-pio-dma/assets/53026754/9aa75906-340e-4c0f-accf-4628bbaae57d)
+![pic1](https://github.com/mxyxbb/parallel-in-pio-dma/assets/53026754/0c733df9-b818-46f0-b546-9fe2cce0a06d)
+
+
 # 主要内容
 
 本文实现的功能实际上十分类似于example中的逻辑分析仪logic_analyser例程。
