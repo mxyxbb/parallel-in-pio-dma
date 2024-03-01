@@ -1,0 +1,46 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program parallel_in
+.side_set 1
+
+; This is just a simple clocked parallel TX. At 200 MHz system clock we can
+; sustain up to 100 * 32 Mbps (16 used here).
+; Data on IN pins 0~15
+; Clock output on GPIO pin 16
+
+.wrap_target
+    in pins, 16   side 0
+    nop           side 1
+.wrap
+
+% c-sdk {
+
+// clock_pin should be a real pin number
+static inline void parallel_in_program_init(PIO pio, uint sm, uint offset, uint pin_base, uint pin_count, uint clock_pin, float div) {
+    for (uint16_t i = 0; i < pin_count; i++)
+        pio_gpio_init(pio, pin_base+i);
+    pio_gpio_init(pio, clock_pin); //wait gpio should be inited. 
+    pio_sm_set_consecutive_pindirs(pio, sm, pin_base, pin_count, false);
+    pio_sm_set_consecutive_pindirs(pio, sm, clock_pin, 1, true);
+    
+    pio_sm_config c = parallel_in_program_get_default_config(offset);
+    sm_config_set_sideset_pins(&c, clock_pin);
+    sm_config_set_in_pins(&c, pin_base);
+    sm_config_set_clkdiv(&c, div);
+    sm_config_set_in_shift(&c, false, true, pin_count);
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);
+    pio_sm_init(pio, sm, offset, &c);
+    //pio_sm_set_enabled(pio, sm, true);
+}
+
+static inline void parallel_in_get(PIO pio, uint sm, uint16_t *x) {
+    while (pio_sm_is_rx_fifo_empty(pio, sm))
+        ;
+    *x = *(volatile uint16_t*)&pio->rxf[sm];
+}
+
+%}

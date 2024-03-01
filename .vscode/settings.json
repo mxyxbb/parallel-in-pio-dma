@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "gpio.h": "c",
+        "interp.h": "c",
+        "dma.h": "c",
+        "*.pio": "c"
+    }
+}
